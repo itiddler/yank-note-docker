@@ -38,6 +38,7 @@ RUN mkdir -p /usr/share/icons/hicolor/256x256/apps && \
 # create launcher with KasmVNC-compatible flags for running Electron in a container
 RUN EXEC_CMD="/opt/yank-note/opt/'Yank Note'/yank-note" && \
     printf '#!/bin/bash\n' > /opt/yank-note/yank-note-launcher.sh && \
+    printf 'exec %s \\\n' 'ncat -l 0.0.0.0 3045 --keep-open --sh-exec "ncat 127.0.0.1 3044" &' >> /opt/yank-note/yank-note-launcher.sh && \
     printf 'exec %s \\\n' "$EXEC_CMD" >> /opt/yank-note/yank-note-launcher.sh && \
     printf '    --no-sandbox \\\n' >> /opt/yank-note/yank-note-launcher.sh && \
     printf '    --disable-gpu \\\n' >> /opt/yank-note/yank-note-launcher.sh && \
