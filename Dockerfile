@@ -18,7 +18,9 @@ ENV TITLE="Yank Note" \
 
 # download yank-note deb package and extract
 # use curl (available in baseimage) instead of wget
-RUN echo "**** download yank-note v${YANK_NOTE_VERSION} deb package ****" && \
+RUN apt update && \
+    apt install -y wget gdebi vim gnome-terminal dbus fcitx-rime fonts-wqy-microhei ttf-wqy-zenhei python3-xdg && \
+    echo "**** download yank-note v${YANK_NOTE_VERSION} deb package ****" && \
     curl -L -f -s \
         "https://github.com/purocean/yn/releases/download/v${YANK_NOTE_VERSION}/Yank-Note-linux-amd64-${YANK_NOTE_VERSION}.deb" \
         -o /tmp/yank-note.deb && \
@@ -42,12 +44,7 @@ RUN echo "**** locate executable ****" && \
     find /opt/yank-note -maxdepth 2 -type f | head -20
 
 # create launcher with KasmVNC-compatible flags for running Electron in a container
-RUN EXEC_CMD="/opt/yank-note/yank-note" && \
-    if [ -f /opt/yank-note/yank-note-bin ]; then \
-        EXEC_CMD="/opt/yank-note/yank-note-bin"; \
-    elif [ -f /opt/yank-note/AppRun ]; then \
-        EXEC_CMD="/opt/yank-note/AppRun"; \
-    fi && \
+RUN EXEC_CMD="/opt/yank-note/opt/Yank Note" && \
     printf '#!/bin/bash\n' > /opt/yank-note/yank-note-launcher.sh && \
     printf 'exec %s \\\n' "$EXEC_CMD" >> /opt/yank-note/yank-note-launcher.sh && \
     printf '    --no-sandbox \\\n' >> /opt/yank-note/yank-note-launcher.sh && \
