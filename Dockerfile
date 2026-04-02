@@ -35,14 +35,6 @@ RUN mkdir -p /usr/share/icons/hicolor/256x256/apps && \
         "https://raw.githubusercontent.com/purocean/yn/v${YANK_NOTE_VERSION}/build/icon.png" \
         -o /usr/share/icons/hicolor/256x256/apps/yank-note.png || true
 
-# find the actual executable and create launcher with KasmVNC-compatible flags
-RUN echo "**** locate executable ****" && \
-    if [ -f /opt/yank-note/yank-note ]; then \
-        mv /opt/yank-note/yank-note /opt/yank-note/yank-note-bin; \
-    fi && \
-    ls -la /opt/yank-note/ && \
-    find /opt/yank-note -maxdepth 2 -type f | head -20
-
 # create launcher with KasmVNC-compatible flags for running Electron in a container
 RUN EXEC_CMD="/opt/yank-note/opt/Yank Note/yank-note" && \
     printf '#!/bin/bash\n' > /opt/yank-note/yank-note-launcher.sh && \
