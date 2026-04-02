@@ -16,35 +16,37 @@ LABEL org.opencontainers.image.version=${YANK_NOTE_VERSION}
 ENV TITLE="Yank Note" \
     YANK_NOTE_VERSION=${YANK_NOTE_VERSION}
 
-# install tools for appimage extraction
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        squashfs-tools \
-        wget \
-    && rm -rf /var/lib/apt/lists/* /tmp/*
-
-# download and extract yank-note appimage
-# the appimage is a self-extracting ELF; --appimage-extract extracts to ./squashfs-root/
-RUN echo "**** download yank-note v${YANK_NOTE_VERSION} appimage ****" && \
-    wget -q "https://github.com/purocean/yn/releases/download/v${YANK_NOTE_VERSION}/Yank-Note-linux-x86_64-${YANK_NOTE_VERSION}.AppImage" \
-        -O /tmp/yank-note.AppImage && \
-    chmod +x /tmp/yank-note.AppImage && \
-    echo "**** extract appimage ****" && \
+# download yank-note deb package and extract
+RUN echo "**** download yank-note v${YANK_NOTE_VERSION} deb package ****" && \
+    wget -q "https://github.com/purocean/yn/releases/download/v${YANK_NOTE_VERSION}/Yank-Note-linux-amd64-${YANK_NOTE_VERSION}.deb" \
+        -O /tmp/yank-note.deb && \
+    echo "**** extract deb to /opt/yank-note ****" && \
     mkdir -p /opt/yank-note && \
-    cd /opt/yank-note && \
-    /tmp/yank-note.AppImage --appimage-extract && \
-    mv squashfs-root/* . && \
-    rmdir squashfs-root && \
-    rm -f /tmp/yank-note.AppImage
+    dpkg-deb -x /tmp/yank-note.deb /opt/yank-note && \
+    rm -f /tmp/yank-note.deb
 
 # install icon
 RUN mkdir -p /usr/share/icons/hicolor/256x256/apps && \
     wget -q "https://raw.githubusercontent.com/purocean/yn/v${YANK_NOTE_VERSION}/build/icon.png" \
         -O /usr/share/icons/hicolor/256x256/apps/yank-note.png || true
 
+# find the actual executable and create launcher with KasmVNC-compatible flags
+RUN echo "**** locate executable ****" && \
+    if [ -f /opt/yank-note/yank-note ]; then \
+        mv /opt/yank-note/yank-note /opt/yank-note/yank-note-bin; \
+    fi && \
+    ls -la /opt/yank-note/ && \
+    find /opt/yank-note -maxdepth 2 -type f | head -20
+
 # create launcher with KasmVNC-compatible flags for running Electron in a container
-RUN printf '#!/bin/bash\n' > /opt/yank-note/yank-note-launcher.sh && \
-    printf 'exec /opt/yank-note/AppRun \\\n' >> /opt/yank-note/yank-note-launcher.sh && \
+RUN EXEC_CMD="/opt/yank-note/yank-note" && \
+    if [ -f /opt/yank-note/yank-note-bin ]; then \
+        EXEC_CMD="/opt/yank-note/yank-note-bin"; \
+    elif [ -f /opt/yank-note/AppRun ]; then \
+        EXEC_CMD="/opt/yank-note/AppRun"; \
+    fi && \
+    printf '#!/bin/bash\n' > /opt/yank-note/yank-note-launcher.sh && \
+    printf 'exec %s \\\n' "$EXEC_CMD" >> /opt/yank-note/yank-note-launcher.sh && \
     printf '    --no-sandbox \\\n' >> /opt/yank-note/yank-note-launcher.sh && \
     printf '    --disable-gpu \\\n' >> /opt/yank-note/yank-note-launcher.sh && \
     printf '    --disable-software-rasterizer \\\n' >> /opt/yank-note/yank-note-launcher.sh && \
