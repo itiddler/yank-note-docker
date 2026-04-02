@@ -17,9 +17,11 @@ ENV TITLE="Yank Note" \
     YANK_NOTE_VERSION=${YANK_NOTE_VERSION}
 
 # download yank-note deb package and extract
+# use curl (available in baseimage) instead of wget
 RUN echo "**** download yank-note v${YANK_NOTE_VERSION} deb package ****" && \
-    wget -q "https://github.com/purocean/yn/releases/download/v${YANK_NOTE_VERSION}/Yank-Note-linux-amd64-${YANK_NOTE_VERSION}.deb" \
-        -O /tmp/yank-note.deb && \
+    curl -L -f -s \
+        "https://github.com/purocean/yn/releases/download/v${YANK_NOTE_VERSION}/Yank-Note-linux-amd64-${YANK_NOTE_VERSION}.deb" \
+        -o /tmp/yank-note.deb && \
     echo "**** extract deb to /opt/yank-note ****" && \
     mkdir -p /opt/yank-note && \
     dpkg-deb -x /tmp/yank-note.deb /opt/yank-note && \
@@ -27,8 +29,9 @@ RUN echo "**** download yank-note v${YANK_NOTE_VERSION} deb package ****" && \
 
 # install icon
 RUN mkdir -p /usr/share/icons/hicolor/256x256/apps && \
-    wget -q "https://raw.githubusercontent.com/purocean/yn/v${YANK_NOTE_VERSION}/build/icon.png" \
-        -O /usr/share/icons/hicolor/256x256/apps/yank-note.png || true
+    curl -L -f -s \
+        "https://raw.githubusercontent.com/purocean/yn/v${YANK_NOTE_VERSION}/build/icon.png" \
+        -o /usr/share/icons/hicolor/256x256/apps/yank-note.png || true
 
 # find the actual executable and create launcher with KasmVNC-compatible flags
 RUN echo "**** locate executable ****" && \
