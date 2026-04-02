@@ -44,7 +44,7 @@ RUN echo "**** locate executable ****" && \
     find /opt/yank-note -maxdepth 2 -type f | head -20
 
 # create launcher with KasmVNC-compatible flags for running Electron in a container
-RUN EXEC_CMD="/opt/yank-note/opt/Yank Note" && \
+RUN EXEC_CMD="/opt/yank-note/opt/Yank Note/yank-note" && \
     printf '#!/bin/bash\n' > /opt/yank-note/yank-note-launcher.sh && \
     printf 'exec %s \\\n' "$EXEC_CMD" >> /opt/yank-note/yank-note-launcher.sh && \
     printf '    --no-sandbox \\\n' >> /opt/yank-note/yank-note-launcher.sh && \
