@@ -64,7 +64,7 @@ RUN echo 'server {' > /etc/nginx/conf.d/3045-proxy.conf && \
     echo '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' >> /etc/nginx/conf.d/3045-proxy.conf && \
     echo '        proxy_set_header X-Forwarded-Proto $scheme;' >> /etc/nginx/conf.d/3045-proxy.conf && \
     echo '    }' >> /etc/nginx/conf.d/3045-proxy.conf && \
-    echo '}' >> /etc/nginx/conf.d/3045-proxy.conf \
+    echo '}' >> /etc/nginx/conf.d/3045-proxy.conf
 
 # copy autostart, menu
 COPY /root/ /
