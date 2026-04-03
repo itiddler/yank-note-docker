@@ -51,9 +51,25 @@ RUN EXEC_CMD="/opt/yank-note/opt/'Yank Note'/yank-note" && \
     chmod +x /opt/yank-note/yank-note-launcher.sh && \
     chown -R abc:abc /opt/yank-note
 
-# copy autostart and menu
+# create nginx reverse proxy config: 127.0.0.1:3044 -> 3045
+RUN echo 'server {' > /etc/nginx/conf.d/3045-proxy.conf && \
+    echo '    listen 3045;' >> /etc/nginx/conf.d/3045-proxy.conf && \
+    echo '    listen [::]:3045;' >> /etc/nginx/conf.d/3045-proxy.conf && \
+    echo '    location / {' >> /etc/nginx/conf.d/3045-proxy.conf && \
+    echo '        proxy_pass http://127.0.0.1:3044;' >> /etc/nginx/conf.d/3045-proxy.conf && \
+    echo '        proxy_set_header Host $host;' >> /etc/nginx/conf.d/3045-proxy.conf && \
+    echo '        proxy_set_header Upgrade $http_upgrade;' >> /etc/nginx/conf.d/3045-proxy.conf && \
+    echo '        proxy_set_header Connection "upgrade";' >> /etc/nginx/conf.d/3045-proxy.conf && \
+    echo '        proxy_set_header X-Real-IP $remote_addr;' >> /etc/nginx/conf.d/3045-proxy.conf && \
+    echo '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' >> /etc/nginx/conf.d/3045-proxy.conf && \
+    echo '        proxy_set_header X-Forwarded-Proto $scheme;' >> /etc/nginx/conf.d/3045-proxy.conf && \
+    echo '    }' >> /etc/nginx/conf.d/3045-proxy.conf && \
+    echo '}' >> /etc/nginx/conf.d/3045-proxy.conf \
+
+# copy autostart, menu
 COPY /root/ /
 
 EXPOSE 3000
+EXPOSE 3045
 
 VOLUME /config
