@@ -16,7 +16,7 @@ Push this repository to your GitHub account. The GitHub Actions workflow will au
 docker run -d \
   --name yank-note \
   -p 3000:3000 \
-  -p 3001:3001 \
+  -p 3045:3045 \
   ghcr.io/<your-username>/yank-note-docker:latest
 ```
 
@@ -55,7 +55,7 @@ gh workflow run build.yml -f yank_note_version=3.87.1
 | Port | Description |
 |------|-------------|
 | `3000` | KasmVNC web interface |
-| `3001` | Yank Note server (if exposed) |
+| `3045` | Yank Note server (if exposed) |
 
 ## Notes
 
